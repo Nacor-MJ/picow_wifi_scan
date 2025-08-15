@@ -38,6 +38,7 @@ Motor::Motor(int In1pin, int In2pin, int PWMpin, int offset, int STBYpin)
    gpio_set_dir(In2, GPIO_OUT);
    gpio_init(PWM);
    gpio_set_dir(PWM, GPIO_OUT); // For PWM, will be set up later
+   gpio_set_function(PWM, GPIO_FUNC_PWM);
    gpio_init(Standby);
    gpio_set_dir(Standby, GPIO_OUT);
 
@@ -64,8 +65,8 @@ void Motor::drive(int speed, int duration)
 
 void Motor::fwd(int speed)
 {
-   gpio_put(In1, 1);
-   gpio_put(In2, 0);
+   gpio_put(In1, true);
+   gpio_put(In2, false);
    uint slice_num = pwm_gpio_to_slice_num(PWM);
    pwm_set_gpio_level(PWM, speed);
 }

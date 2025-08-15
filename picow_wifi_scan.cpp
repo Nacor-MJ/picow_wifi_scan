@@ -11,10 +11,10 @@
 
 #include "include/SparkFun_TB6612FNG/SparkFun_TB6612.h"
 
-// includes the ssid and pass char[]
+// includes the char ssid[] and char pass[]
 #include "wifi.h"
 
-Motor motor(4, 5, 6, 1, 9);
+Motor motor(3, 2, 4, 1, 5);
 
 // is responsible for connecting to the wifi
 int connect_to_wifi(int retries)
@@ -68,7 +68,7 @@ int main()
 
     bool led_on = false;
     bool exit = false;
-    const uint64_t loop_time = 100000;
+    const uint64_t loop_time = 1000000;
     absolute_time_t next_loop;
 
     while (!exit)

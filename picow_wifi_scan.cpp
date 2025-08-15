@@ -9,6 +9,10 @@
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
 
+#include "include/SparkFun_TB6612FNG/SparkFun_TB6612.h"
+
+Motor motor(4, 5, 6, 1, 9);
+
 // is responsible for connecting to the wifi
 int connect_to_wifi(int retries)
 {

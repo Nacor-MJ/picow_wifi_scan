@@ -9,12 +9,11 @@
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
 
-char ssid[] = "BAB2";
-char pass[] = "0000000555";
-
-int main()
+// is responsible for connecting to the wifi
+int connect_to_wifi(int retries)
 {
-    stdio_init_all();
+    char ssid[] = "BAB2";
+    char pass[] = "0000000555";
 
     if (cyw43_arch_init())
     {
@@ -25,24 +24,60 @@ int main()
 
     cyw43_arch_enable_sta_mode();
 
-    if (cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, 10000))
+    while (retries-- > 0)
     {
-        printf("failed to connect\n");
+        switch (cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, 10000))
+        {
+        case PICO_ERROR_BADAUTH:
+            printf("failed to connect wrong password, retrying...\n");
+            break;
+        case PICO_ERROR_CONNECT_FAILED:
+            printf("failed to connect, connection failed, retrying...\n");
+            break;
+        case PICO_ERROR_TIMEOUT:
+            printf("failed to connect, connection timed out, retrying...\n");
+            break;
+        case 0:
+            printf("succesfully connected\n");
+            goto connected;
+        }
+    }
+    // NOTE: I know this is very stupid but I've always dreamt of using a goto
+    // if we fail too many times we fall through here
+    return 1;
+    // if we succed the goto takes us here
+connected:
+    return 0;
+}
+
+int main()
+{
+    stdio_init_all();
+    printf("\n\n---------------\n");
+
+    if (connect_to_wifi(10))
+    {
+        printf("failed connection :(");
+        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, true);
         return 1;
     }
-    printf("connected\n");
 
     bool led_on = false;
     bool exit = false;
+    const uint64_t loop_time = 100000;
+    absolute_time_t next_loop;
+
     while (!exit)
     {
+        next_loop = get_absolute_time() + loop_time;
+
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, led_on);
         led_on = !led_on;
-        // if you are using pico_cyw43_arch_poll, then you must poll periodically from your
-        // main loop (not from a timer) to check for Wi-Fi driver or lwIP work that needs to be done.
+
         cyw43_arch_poll();
-        sleep_ms(1000);
-        printf("YMCA\n");
+
+        // waits for up to 100 ms
+        sleep_until(next_loop);
     }
 
     cyw43_arch_deinit();

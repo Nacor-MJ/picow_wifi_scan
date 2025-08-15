@@ -14,7 +14,7 @@
 // includes the char ssid[] and char pass[]
 #include "wifi.h"
 
-Motor motor(3, 2, 4, 1, 5);
+Motor motor(26, 27, 4, 1, 5);
 
 // is responsible for connecting to the wifi
 int connect_to_wifi(int retries)
@@ -54,6 +54,22 @@ connected:
     return 0;
 }
 
+volatile int motor_drive = 0;
+void loop_motor()
+{
+    if (motor_drive == 0)
+    {
+        motor.brake();
+    }
+    else
+    {
+        motor.drive(motor_drive);
+    }
+}
+void loop_servo()
+{
+}
+
 int main()
 {
     stdio_init_all();
@@ -77,6 +93,9 @@ int main()
 
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, led_on);
         led_on = !led_on;
+
+        loop_motor();
+        loop_servo();
 
         cyw43_arch_poll();
 

@@ -11,14 +11,14 @@
 
 #include "include/SparkFun_TB6612FNG/SparkFun_TB6612.h"
 
+// includes the ssid and pass char[]
+#include "wifi.h"
+
 Motor motor(4, 5, 6, 1, 9);
 
 // is responsible for connecting to the wifi
 int connect_to_wifi(int retries)
 {
-    char ssid[] = "BAB2";
-    char pass[] = "0000000555";
-
     if (cyw43_arch_init())
     {
         printf("failed to initialise\n");
@@ -30,7 +30,7 @@ int connect_to_wifi(int retries)
 
     while (retries-- > 0)
     {
-        switch (cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, 10000))
+        switch (cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, 3333))
         {
         case PICO_ERROR_BADAUTH:
             printf("failed to connect wrong password, retrying...\n");

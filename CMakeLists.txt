@@ -54,6 +54,7 @@ pico_add_extra_outputs(picow_wifi_scan_background)
 add_executable(picow_wifi_scan_poll
         picow_wifi_scan.cpp
         SparkFun_TB6612.cpp
+        servo.cpp
         )
 target_include_directories(picow_wifi_scan_poll PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}

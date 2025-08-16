@@ -10,11 +10,14 @@
 #include "pico/cyw43_arch.h"
 
 #include "SparkFun_TB6612.h"
+// TODO: make a header file for this
+#include "servo.cpp"
 
 // includes the char ssid[] and char pass[]
 #include "wifi.h"
 
 Motor motor(26, 27, 28, 1, 5);
+Servo servo(5);
 
 // is responsible for connecting to the wifi
 int connect_to_wifi(int retries)
@@ -75,16 +78,19 @@ void loop_motor()
 
     last_motor_drive = motor_drive;
 }
+
 volatile int servo_dir = 0;
 int last_servo_dir = 0;
 void loop_servo()
 {
+    // servo_dir = (servo_dir + 10) % 180;
     if (last_servo_dir == servo_dir)
     {
         return;
     }
 
     printf("servo_dir: %d\n", servo_dir);
+    servo.set_angle(servo_dir);
 
     last_servo_dir = servo_dir;
 }

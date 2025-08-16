@@ -62,7 +62,6 @@ void Motor::fwd(int speed)
 {
    gpio_put(In1, true);
    gpio_put(In2, false);
-   uint slice_num = pwm_gpio_to_slice_num(PWM);
    pwm_set_gpio_level(PWM, speed);
 }
 
@@ -70,7 +69,6 @@ void Motor::rev(int speed)
 {
    gpio_put(In1, 0);
    gpio_put(In2, 1);
-   uint slice_num = pwm_gpio_to_slice_num(PWM);
    pwm_set_gpio_level(PWM, speed);
 }
 
@@ -78,7 +76,6 @@ void Motor::brake()
 {
    gpio_put(In1, 1);
    gpio_put(In2, 1);
-   uint slice_num = pwm_gpio_to_slice_num(PWM);
    pwm_set_gpio_level(PWM, 0);
 }
 

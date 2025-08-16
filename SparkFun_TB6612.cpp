@@ -57,11 +57,6 @@ void Motor::drive(int speed)
    else
       rev(-speed);
 }
-void Motor::drive(int speed, int duration)
-{
-   drive(speed);
-   sleep_ms(duration);
-}
 
 void Motor::fwd(int speed)
 {

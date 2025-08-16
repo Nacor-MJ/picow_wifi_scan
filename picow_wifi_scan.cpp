@@ -9,12 +9,12 @@
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
 
-#include "include/SparkFun_TB6612FNG/SparkFun_TB6612.h"
+#include "SparkFun_TB6612.h"
 
 // includes the char ssid[] and char pass[]
 #include "wifi.h"
 
-Motor motor(26, 27, 4, 1, 5);
+Motor motor(26, 27, 28, 1, 5);
 
 // is responsible for connecting to the wifi
 int connect_to_wifi(int retries)
@@ -57,6 +57,7 @@ connected:
 volatile int motor_drive = 0;
 void loop_motor()
 {
+    printf("motor drive: %d\n", motor_drive);
     if (motor_drive == 0)
     {
         motor.brake();
@@ -66,8 +67,10 @@ void loop_motor()
         motor.drive(motor_drive);
     }
 }
+volatile int servo_dir = 0;
 void loop_servo()
 {
+    printf("servo_dir: %d\n", servo_dir);
 }
 
 int main()
@@ -84,7 +87,7 @@ int main()
 
     bool led_on = false;
     bool exit = false;
-    const uint64_t loop_time = 1000000;
+    const uint64_t loop_time = 100000;
     absolute_time_t next_loop;
 
     while (!exit)
@@ -96,6 +99,7 @@ int main()
 
         loop_motor();
         loop_servo();
+        printf("\n");
 
         cyw43_arch_poll();
 

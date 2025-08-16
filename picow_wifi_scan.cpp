@@ -55,8 +55,14 @@ connected:
 }
 
 volatile int motor_drive = 0;
+int last_motor_drive = 0;
 void loop_motor()
 {
+    if (last_motor_drive == motor_drive)
+    {
+        return;
+    }
+
     printf("motor drive: %d\n", motor_drive);
     if (motor_drive == 0)
     {
@@ -66,11 +72,21 @@ void loop_motor()
     {
         motor.drive(motor_drive);
     }
+
+    last_motor_drive = motor_drive;
 }
 volatile int servo_dir = 0;
+int last_servo_dir = 0;
 void loop_servo()
 {
+    if (last_servo_dir == servo_dir)
+    {
+        return;
+    }
+
     printf("servo_dir: %d\n", servo_dir);
+
+    last_servo_dir = servo_dir;
 }
 
 int main()
@@ -99,14 +115,14 @@ int main()
 
         loop_motor();
         loop_servo();
-        printf("\n");
 
         cyw43_arch_poll();
 
-        // waits for up to 100 ms
+        // waits for `loop_time` us
         sleep_until(next_loop);
     }
 
+    motor.brake();
     cyw43_arch_deinit();
     return 0;
 }

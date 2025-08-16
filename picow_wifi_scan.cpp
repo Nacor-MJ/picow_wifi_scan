@@ -113,12 +113,23 @@ int main()
         return 1;
     }
 
+    // Optionally pass netif pointer for nicer logging. Here we use netif_list from lwIP.
+    extern struct netif *netif_list;
+    pico_tcp::TcpServer server(netif_list);
+
+    if (!server.start())
+    {
+        printf("Server failed to start\n");
+        cyw43_arch_deinit();
+        return 1;
+    }
+
     bool led_on = false;
     bool exit = false;
     const uint64_t loop_time = 100000;
     absolute_time_t next_loop;
 
-    while (!exit)
+    while (!exit || !server.is_complete())
     {
         next_loop = get_absolute_time() + loop_time;
 
@@ -131,29 +142,7 @@ int main()
         cyw43_arch_poll();
 
         // waits for `loop_time` us
-        sleep_until(next_loop);
-    }
-
-    // Optionally pass netif pointer for nicer logging. Here we use netif_list from lwIP.
-    extern struct netif *netif_list;
-    pico_tcp::TcpServer server(netif_list);
-
-    if (!server.start())
-    {
-        printf("Server failed to start\n");
-        cyw43_arch_deinit();
-        return 1;
-    }
-
-    // Main loop: poll Wi-Fi/lwIP if necessary until server reports complete.
-    while (!server.is_complete())
-    {
-#if PICO_CYW43_ARCH_POLL
-        cyw43_arch_poll();
-        cyw43_arch_wait_for_work_until(make_timeout_time_ms(1000));
-#else
-        sleep_ms(1000);
-#endif
+        cyw43_arch_wait_for_work_until(next_loop);
     }
 
     int status = server.last_status();

@@ -8,10 +8,12 @@
 
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
+#include "pico/stdlib.h"
 
 #include "SparkFun_TB6612.h"
 // TODO: make a header file for this
 #include "servo.cpp"
+#include "tcp_server.hpp"
 
 // includes the char ssid[] and char pass[]
 #include "wifi.h"
@@ -95,6 +97,10 @@ void loop_servo()
     last_servo_dir = servo_dir;
 }
 
+void loop_server()
+{
+}
+
 int main()
 {
     stdio_init_all();
@@ -127,6 +133,31 @@ int main()
         // waits for `loop_time` us
         sleep_until(next_loop);
     }
+
+    // Optionally pass netif pointer for nicer logging. Here we use netif_list from lwIP.
+    extern struct netif *netif_list;
+    pico_tcp::TcpServer server(netif_list);
+
+    if (!server.start())
+    {
+        printf("Server failed to start\n");
+        cyw43_arch_deinit();
+        return 1;
+    }
+
+    // Main loop: poll Wi-Fi/lwIP if necessary until server reports complete.
+    while (!server.is_complete())
+    {
+#if PICO_CYW43_ARCH_POLL
+        cyw43_arch_poll();
+        cyw43_arch_wait_for_work_until(make_timeout_time_ms(1000));
+#else
+        sleep_ms(1000);
+#endif
+    }
+
+    int status = server.last_status();
+    printf("Done. status=%d\n", status);
 
     motor.brake();
     cyw43_arch_deinit();

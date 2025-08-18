@@ -60,7 +60,7 @@ connected:
 }
 
 volatile int motor_drive = 0;
-int last_motor_drive = 0;
+int last_motor_drive = motor_drive - 1;
 void loop_motor()
 {
     if (last_motor_drive == motor_drive)
@@ -81,11 +81,10 @@ void loop_motor()
     last_motor_drive = motor_drive;
 }
 
-volatile int servo_dir = 0;
-int last_servo_dir = 0;
+volatile int servo_dir = 90;
+int last_servo_dir = servo_dir - 1;
 void loop_servo()
 {
-    // servo_dir = (servo_dir + 10) % 180;
     if (last_servo_dir == servo_dir)
     {
         return;
@@ -123,6 +122,7 @@ int main()
         cyw43_arch_deinit();
         return 1;
     }
+    printf("server started");
 
     bool led_on = false;
     bool exit = false;

@@ -38,6 +38,7 @@ pico_sdk_init()
 add_executable(picow_wifi_scan_background
         picow_wifi_scan.cpp
         SparkFun_TB6612.cpp
+        tcp_server.cpp
         )
 target_include_directories(picow_wifi_scan_background PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
@@ -55,6 +56,7 @@ add_executable(picow_wifi_scan_poll
         picow_wifi_scan.cpp
         SparkFun_TB6612.cpp
         servo.cpp
+        tcp_server.cpp
         )
 target_include_directories(picow_wifi_scan_poll PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
